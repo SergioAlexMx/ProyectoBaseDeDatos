@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 import os
 import cx_Oracle
 from flask import Flask, render_template, request
@@ -9,7 +9,8 @@ app = Flask(__name__)
 connection = cx_Oracle.connect("dummy2/dummy2@localhost:49161/xe")
 fusuarAdd = False
 
-
+# private session
+app.secret_key = "mysecretkey"
 
 @app.route('/')
 def home():
@@ -35,8 +36,17 @@ def mostrarUsuarios():
     cur = connection.cursor()
     cur.execute("SELECT * FROM usuarios")
     data = cur.fetchall()
+    cur.close()
+    return render_template("mostrar_usuarios.html", users = data)
 
-    return render_template()
+
+@app.route("/delete_user/<string:id>")
+def deleteUser(id):
+    cur = connection.cursor()
+    cur.execute("DELETE FROM usuarios WHERE id_usuario = %s" %(id))
+    connection.commit()
+
+    return redirect("/mostrar_usuarios")
 
 @app.route("/add_user", methods=["POST"])
 def addUser():
@@ -53,7 +63,7 @@ def addUser():
         connection.commit()
         cur.close()
         fusuarAdd = True
-    return redirect("/usuario_agregado")
+    return redirect("/add_user")
 
 
 @app.route("/testDB")

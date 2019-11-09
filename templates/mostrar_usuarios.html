@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<table>
+<thead>
+<tr>
+    <td>Id</td>
+    <td>Nombre</td>
+    <td>Apellido</td>
+    <td>Correo</td>
+    <td>Password</td>
+    <td>Estado</td>
+    <td>Operaciones</td>
+</tr>
+</thead>
+<tbody>
+{% for user in users %}
+    <tr>
+        <td>{{ user.0 }}</td>
+        <td>{{ user.1 }}</td>
+        <td>{{ user.2 }}</td>
+        <td>{{ user.3 }}</td>
+        <td>{{ user.4 }}</td>
+        {% if user.5 == '1' %}
+            <td>Activo</td>
+        {% else %}
+            <td>Suspendido</td>
+        {% endif %}
+        <td>
+            <a href="/editUser/{{ user.0 }}" >Editar</a>
+            <a href="/delete_user/{{ user.0 }}">Eliminar</a>
+        </td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+</html>
