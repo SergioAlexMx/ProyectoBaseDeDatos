@@ -6,15 +6,10 @@ app = Flask(__name__)
 
 # ORACLE CONNECTION
 connection = cx_Oracle.connect("dummy2/dummy2@localhost:49161/xe")
-
+fusuarAdd = False
 @app.route('/')
 def home():
     return render_template("home.html")
-
-@app.route("/musi")
-def casa():
-    return render_template("axel.html")
-
 
 @app.route("/about")
 def acercaDe():
@@ -24,6 +19,11 @@ def acercaDe():
 @app.route("/agregar_usuarios")
 def addUsers():
     return render_template("AgregarUsuarios.html")
+
+
+@app.route("/usuario_agregado")
+def usuarioAgregado():
+    return render_template("usuarioAgregado.html")
 
 
 @app.route("/add_user", methods=["POST"])
@@ -38,7 +38,8 @@ def addUser():
         cur.execute( "INSERT INTO usuarios(NOMBRE, APELLIDO, CORREO, PASSWORD, ES_ACTIVO) VALUES ('%s','%s','%s','%s','%s')" % (nombre, apellidos, email, psswd, '1'))
         connection.commit()
         cur.close()
-    return redirect("/agregar_usuarios")
+        fusuarAdd = True
+    return redirect("/usuario_agregado")
 
 
 @app.route("/testDB")
