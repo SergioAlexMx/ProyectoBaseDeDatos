@@ -1,15 +1,20 @@
 from flask import Flask, render_template, request, redirect, url_for
 import os
 import cx_Oracle
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
 # ORACLE CONNECTION
 connection = cx_Oracle.connect("dummy2/dummy2@localhost:49161/xe")
 fusuarAdd = False
+
+
+
 @app.route('/')
 def home():
     return render_template("home.html")
+
 
 @app.route("/about")
 def acercaDe():
@@ -25,6 +30,13 @@ def addUsers():
 def usuarioAgregado():
     return render_template("usuarioAgregado.html")
 
+@app.route("/mostrar_usuarios")
+def mostrarUsuarios():
+    cur = connection.cursor()
+    cur.execute("SELECT * FROM usuarios")
+    data = cur.fetchall()
+
+    return render_template()
 
 @app.route("/add_user", methods=["POST"])
 def addUser():
@@ -35,7 +47,9 @@ def addUser():
         email = request.form["email"]
         psswd = request.form["password"]
 
-        cur.execute( "INSERT INTO usuarios(NOMBRE, APELLIDO, CORREO, PASSWORD, ES_ACTIVO) VALUES ('%s','%s','%s','%s','%s')" % (nombre, apellidos, email, psswd, '1'))
+        cur.execute(
+            "INSERT INTO usuarios(NOMBRE, APELLIDO, CORREO, PASSWORD, ES_ACTIVO) VALUES ('%s','%s','%s','%s','%s')" % (
+            nombre, apellidos, email, psswd, '1'))
         connection.commit()
         cur.close()
         fusuarAdd = True
