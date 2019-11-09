@@ -12,6 +12,7 @@ fusuarAdd = False
 # private session
 app.secret_key = "mysecretkey"
 
+
 @app.route('/')
 def home():
     return render_template("home.html")
@@ -31,22 +32,50 @@ def addUsers():
 def usuarioAgregado():
     return render_template("usuarioAgregado.html")
 
+
 @app.route("/mostrar_usuarios")
 def mostrarUsuarios():
     cur = connection.cursor()
     cur.execute("SELECT * FROM usuarios")
     data = cur.fetchall()
     cur.close()
-    return render_template("mostrar_usuarios.html", users = data)
+    return render_template("mostrar_usuarios.html", users=data)
+
+
+@app.route("/update/<string:id>", methods=["POST"])
+def setUser(id):
+    if request.method == "POST":
+        nombre = request.form["name"]
+        apellidos = request.form["lastName"]
+        email = request.form["email"]
+        psswd = request.form["password"]
+        cur = connection.cursor()
+
+        cur.execute("""
+        update usuarios set NOMBRE='%s', APELLIDO='%s', CORREO='%s', PASSWORD='%s' where ID_USUARIO=%s"""
+                    % (nombre, apellidos, email, psswd, id))
+
+        connection.commit()
+        cur.close()
+        return redirect("/mostrar_usuarios")
+
+
+@app.route("/edit_user/<string:id>")
+def getUser(id):
+    cur = connection.cursor()
+    cur.execute("SELECT * FROM USUARIOS WHERE id_usuario=%s" % (id))
+    data = cur.fetchall()[0]
+    cur.close
+    return render_template("editarUsuario.html", user=data)
 
 
 @app.route("/delete_user/<string:id>")
 def deleteUser(id):
     cur = connection.cursor()
-    cur.execute("DELETE FROM usuarios WHERE id_usuario = %s" %(id))
+    cur.execute("DELETE FROM usuarios WHERE id_usuario = %s" % (id))
     connection.commit()
-
     return redirect("/mostrar_usuarios")
+
 
 @app.route("/add_user", methods=["POST"])
 def addUser():
@@ -59,11 +88,11 @@ def addUser():
 
         cur.execute(
             "INSERT INTO usuarios(NOMBRE, APELLIDO, CORREO, PASSWORD, ES_ACTIVO) VALUES ('%s','%s','%s','%s','%s')" % (
-            nombre, apellidos, email, psswd, '1'))
+                nombre, apellidos, email, psswd, '1'))
         connection.commit()
         cur.close()
         fusuarAdd = True
-    return redirect("/add_user")
+    return redirect("/agregar_usuarios")
 
 
 @app.route("/testDB")
